@@ -1,39 +1,33 @@
-from flask import Flask, request, render_template, send_from_directory
+import streamlit as st
 import cv2
-import numpy as np
+numpy as np
 from image_transformation import *
 
-app = Flask(__name__)
+st.title("Image Transformation App")
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+# Upload an image
+uploaded_image = st.file_uploader("Upload an Image", type=["jpg", "jpeg", "png"])
 
-@app.route('/transform', methods=['POST'])
-def transform():
-    if 'image' in request.files:
-        image_file = request.files['image']
-        transformation_type = request.form['transformation']
-        parameter = float(request.form['parameter'])
+if uploaded_image is not None:
+    image = cv2.imdecode(np.frombuffer(uploaded_image.read(), np.uint8), cv2.IMREAD_COLOR)
 
-        # Load the uploaded image into a NumPy array using OpenCV
-        image = cv2.imdecode(np.frombuffer(image_file.read(), np.uint8), cv2.IMREAD_COLOR)
+    # Display the original image
+    st.header("Original Image")
+    st.image(image, use_column_width=True)
 
-        cv2.imwrite('static/original_image.jpg', image)
+    transformation_type = st.selectbox("Select Transformation", ["Rotate", "Scale", "Translate", "Shear"])
+    parameter = st.number_input("Enter Transformation Parameter")
 
-        if transformation_type == 'rotate':
+    if st.button("Transform"):
+        if transformation_type == "Rotate":
             transformed_image = rotate_image(image, parameter)
-        elif transformation_type == 'scale':
+        elif transformation_type == "Scale":
             transformed_image = scale_image(image, parameter, parameter)
-        elif transformation_type == 'translate':
+        elif transformation_type == "Translate":
             transformed_image = translate_image(image, parameter, parameter)
-        elif transformation_type == 'shear':
+        elif transformation_type == "Shear":
             transformed_image = shear_image(image, parameter, parameter)
 
-        # Save the transformed image using OpenCV
-        cv2.imwrite('static/transformed_image.jpg', transformed_image)
-
-        return render_template('index.html')
-
-if __name__ == '__main__':
-    app.run(debug=True)
+        # Display the transformed image
+        st.header("Transformed Image")
+        st.image(transformed_image, use_column_width=True)
