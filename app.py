@@ -20,7 +20,7 @@ def translate_image(image, dx, dy):
 
 def shear_image(image, shear_x, shear_y):
     shear_matrix = np.array([[1, shear_x, 0], [shear_y, 1, 0]], dtype=np.float32)
-    sheared_image = cv2.warpAffine(image, shear_matrix, (image.shape[1], image.shape[0))
+    sheared_image = cv2.warpAffine(image, shear_matrix, (image.shape[1], image.shape[0]))
     return sheared_image
 
 st.title("Image Transformation App")
